@@ -10,7 +10,7 @@ n = int(argv[1])
 t1  = time()
 sum = 0
 for i in range(n):
-	sum += i
+	sum += i&255
 t2 = time()
 
 print(f"Summing took ~{(t2 - t1)*1000}ms")

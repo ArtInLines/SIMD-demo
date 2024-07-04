@@ -6,15 +6,9 @@ if (process.argv.length < 3) {
 }
 
 let n = Number(process.argv[2])
-let sum;
+let sum = 0;
 let t1 = Date.now()
-if (n > 100000000) {
-	sum = BigInt(0);
-	for (let i = 0; i < n; i++) sum += BigInt(i)
-} else {
-	 sum = 0;
-	for (let i = 0; i < n; i++) sum += i
-}
+for (let i = 0; i < n; i++)	sum += i & 0xff;
 let t2 = Date.now()
 
 console.log(`Summing took ~${t2 - t1}ms`);
