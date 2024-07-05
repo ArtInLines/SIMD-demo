@@ -113,16 +113,19 @@ u64 sum_wide(u64 start, u64 end)
 u64 sum_simd(u64 start, u64 end)
 {
 	u64 t0 = cpu_timer();
-	u64 n = end/WIDTH*WIDTH;
+	u64 n  = end/WIDTH*WIDTH;
 	u64 sums[WIDTH];
 	__m256i sum      = _mm256_setzero_si256();
-	__m256i summands = _mm256_set_epi64x(0, 1, 2, 3);
 	__m256i mask     = _mm256_set_epi64x(0xff, 0xff, 0xff, 0xff);
+	u64 iwide_vals[] = { 0, 1, 2, 3 };
+	__m256i iwide    = _mm256_loadu_si256(&iwide_vals);
+	u64 inc_val      = WIDTH;
+	__m256i inc      = _mm256_castpd_si256(_mm256_broadcast_sd((f64*)&inc_val));
+	__m256i tmp;
 	for (u64 i = start; i < n; i += WIDTH) {
-		__m256i tmp = _mm256_set1_epi64x(i);
-		tmp = _mm256_add_epi64(tmp, summands);
-		tmp = _mm256_and_si256(tmp, mask);
-		sum = _mm256_add_epi64(sum, tmp);
+		tmp   = _mm256_and_si256(iwide, mask);
+		sum   = _mm256_add_epi64(sum, tmp);
+		iwide = _mm256_add_epi64(iwide, inc);
 	}
 	_mm256_storeu_si256((void*)sums, sum);
 	u64 s = sums[0] + sums[1] + sums[2] + sums[3];
